@@ -1,5 +1,3 @@
-
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,15 +12,48 @@ model User {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  name          String
-  email         String  @unique
-  password      String
+  name     String?
+  email    String  @unique
+  password String
 
-  isHasPremium  Boolean @default(false) @map("is_has_premium")
+  isHasPremium Boolean  @default(false) @map("is_has_premium")
+  role         UserRole @default(USER)
 
-  role UserRole @default(USER)
+  tasks      Task[]
+  timeBlocks TimeBlock[]
 
   @@map("users")
+}
+
+model Task {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  name        String
+  priority    Priority @default(LOW)
+  isCompleted Boolean  @default(false) @map("is_completed")
+
+  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String?
+
+  @@map("tasks")
+}
+
+model TimeBlock {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  name     String
+  color    String
+  duration Int
+  order    Int    @default(1)
+
+  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String?
+
+  @@map("time_blocks")
 }
 
 enum UserRole {
@@ -30,3 +61,8 @@ enum UserRole {
   USER
 }
 
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+}
